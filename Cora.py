@@ -43,6 +43,7 @@ print(cora.x)
 print(cora.edge_index.T)
 print(sorted(Counter(cora.y.tolist()).items()))
 
+print(cora)
 
 def convert_to_networkx(graph, n_sample=None):
     g = to_networkx(graph, node_attrs=["x"])

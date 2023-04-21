@@ -11,3 +11,7 @@ Then, the graph Laplacian L is the square n×n matrix defined as: L=D−A.
 
 Although it encodes precisely the same information as the adjacency matrix A
 
+node classification example with Cora:
+
+https://towardsdatascience.com/graph-neural-networks-with-pyg-on-node-classification-link-prediction-and-anomaly-detection-14aa38fe1275
+

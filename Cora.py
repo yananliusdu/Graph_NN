@@ -1,3 +1,7 @@
+
+#https://towardsdatascience.com/graph-neural-networks-with-pyg-on-node-classification-link-prediction-and-anomaly-detection-14aa38fe1275
+
+
 from torch_geometric.datasets import Planetoid
 import torch.nn.functional as F
 from torch_geometric.nn import GCNConv
@@ -7,6 +11,8 @@ import matplotlib.pyplot as plt
 import torch_geometric
 from torch_geometric.data import Data
 from torch_geometric.utils.convert import to_networkx
+from collections import Counter
+import random
 
 dataset = Planetoid(root='Cora', name='Cora')
 cora = dataset[0]
@@ -32,6 +38,29 @@ print(f'Contains isolated nodes: {cora.contains_isolated_nodes()}')
 print(f'Contains self-loops: {cora.contains_self_loops()}')
 print(f'Is undirected: {cora.is_undirected()}')
 
+corax = cora.x
+print(cora.x)
+print(cora.edge_index.T)
+print(sorted(Counter(cora.y.tolist()).items()))
+
+
+def convert_to_networkx(graph, n_sample=None):
+    g = to_networkx(graph, node_attrs=["x"])
+    y = graph.y.numpy()
+    if n_sample is not None:
+        sampled_nodes = random.sample(g.nodes, n_sample)
+        g = g.subgraph(sampled_nodes)
+        y = y[sampled_nodes]
+    return g, y
+
+def plot_graph(g, y):
+    fig, ax = plt.subplots(figsize=(9, 7))
+    nx.draw_spring(g, node_size=30, arrows=True, node_color=y, ax=ax)
+    plt.show()
+
+g, y = convert_to_networkx(cora, n_sample=1000)
+plot_graph(g, y)
+
 # # Convert the edge index to an adjacency matrix
 # adj_matrix = nx.to_numpy_array(nx.from_edgelist(cora.edge_index.t().tolist()))
 # # Create a NetworkX graph from the adjacency matrix
@@ -45,12 +74,12 @@ print(f'Is undirected: {cora.is_undirected()}')
 
 
 
-x = cora.x
-edge_index = cora.edge_index
-data = torch_geometric.data.Data(x=x, edge_index=edge_index)
-g = torch_geometric.utils.to_networkx(data, to_undirected=False)
-nx.draw_networkx(g, with_labels=True)
-plt.show()
+# x = cora.x
+# edge_index = cora.edge_index
+# data = torch_geometric.data.Data(x=x, edge_index=edge_index)
+# g = torch_geometric.utils.to_networkx(data, to_undirected=False)
+# nx.draw_networkx(g, with_labels=True)
+# plt.show()
 
 
 class GCN(torch.nn.Module):
@@ -61,7 +90,6 @@ class GCN(torch.nn.Module):
 
     def forward(self, data):
         x, edge_index = data.x, data.edge_index
-
         x = self.conv1(x, edge_index)
         x = F.relu(x)
         x = F.dropout(x, training=self.training)

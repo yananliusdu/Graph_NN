@@ -81,15 +81,12 @@ class GCN(torch.nn.Module):
 
     def forward(self, data):
         x, edge_index = data.x, data.edge_index
-
         x = self.conv1(x, edge_index)
         x = F.relu(x)
         output = self.conv2(x, edge_index)
-
         return output
 
 def train_node_classifier(model, graph, optimizer, criterion, n_epochs=200):
-
     for epoch in range(1, n_epochs + 1):
         model.train()
         optimizer.zero_grad()
@@ -115,6 +112,7 @@ def eval_node_classifier(model, graph, mask):
     acc = int(correct) / int(mask.sum())
 
     return acc
+
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 graph = graph.to(device)
